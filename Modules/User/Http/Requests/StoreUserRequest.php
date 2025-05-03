@@ -1,0 +1,40 @@
+<?php
+
+namespace Modules\User\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreUserRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return auth()->user()->hasPermissionTo('manage-users');
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'roles' => ['sometimes', 'array'],
+            'roles.*' => ['exists:roles,name'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'The name is required.',
+            'email.required' => 'The email address is required.',
+            'email.email' => 'The email address must be a valid email format.',
+            'email.unique' => 'The email address has already been taken.',
+            'password.required' => 'The password is required.',
+            'password.string' => 'The password must be a string.',
+            'password.min' => 'The password must be at least 8 characters long.',
+            'password.confirmed' => 'The password confirmation does not match.',
+            'roles.array' => 'Roles must be an array.',
+            'roles.*.exists' => 'One or more selected roles do not exist.',
+        ];
+    }
+}
