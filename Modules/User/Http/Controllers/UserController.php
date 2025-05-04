@@ -30,7 +30,7 @@ class UserController extends Controller
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
-     *         description="Number of items per page",
+     *         description="Number of users per page",
      *         required=false,
      *         @OA\Schema(type="integer", default=15)
      *     ),

@@ -8,8 +8,6 @@ use Modules\Product\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class OrderService
 {
@@ -71,7 +69,14 @@ class OrderService
 
     public function updateOrder(int $id, array $data): Order
     {
-        return $this->orderRepository->update($id, $data);
+        $order = $this->orderRepository->findById($id);
+        if (isset($data['status']) && $data['status'] !== $order->status) {
+            $order->update($data);
+            event(new \App\Events\OrderStatusUpdated($order));
+        } else {
+            $order->update($data);
+        }
+        return $order;
     }
 
     public function deleteOrder(int $id): bool

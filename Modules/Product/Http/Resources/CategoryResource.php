@@ -14,6 +14,15 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+            'prducts_count' => $this->products_count,
+            'products' => $this->whenLoaded('products', function () {
+                return $this->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

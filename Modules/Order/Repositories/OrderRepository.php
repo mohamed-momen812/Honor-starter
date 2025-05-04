@@ -21,7 +21,7 @@ class OrderRepository implements OrderRepositoryInterface
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('user_id'),
-                AllowedFilter::exact('status'),
+                AllowedFilter::exact('status'), // e.g., 'pending', 'completed' , 'delivered'
                 AllowedFilter::scope('total_lte', 'whereTotalLessThanOrEqual'),
             ])
             ->allowedSorts(['total', 'created_at', 'status'])
@@ -36,7 +36,9 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function findById(int $id): ?Order
     {
-        return Order::with(['user', 'items.product'])->find($id);
+        return QueryBuilder::for(Order::class)
+            ->allowedIncludes(['user', 'items.product']) // Include user and product details
+            ->find($id);
     }
 
     public function create(array $data): Order

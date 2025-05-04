@@ -12,7 +12,14 @@ class RoleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'permissions' => $this->permissions->pluck('name'),
+            'permissions' => $this->whenLoaded('permissions', function () { // Retrieve a relationship if it has been loaded.
+                return $this->permissions->map(function ($permission) {
+                    return [
+                        'id' => $permission->id,
+                        'name' => $permission->name,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

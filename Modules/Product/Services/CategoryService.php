@@ -31,10 +31,15 @@ class CategoryService
         return $this->categoryRepository->findById($id);
     }
 
-    public function createCategory(array $data): Category
+    public function createCategory(array $data, array $products = []): Category
     {
         $data['slug'] = \Str::slug($data['name']);
-        return $this->categoryRepository->create($data);
+        $category = $this->categoryRepository->create($data);
+
+        if (!empty($products)) {
+            $category->products()->attach($products);
+        }
+        return $category;
     }
 
     public function updateCategory(int $id, array $data): Category

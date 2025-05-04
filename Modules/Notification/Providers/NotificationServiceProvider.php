@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Modules\Notification\Repositories\NotificationRepository;
+use Modules\Notification\Repositories\NotificationRepositoryInterface;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,8 @@ class NotificationServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        $this->app->bind(NotificationRepositoryInterface::class, NotificationRepository::class);
     }
 
     /**

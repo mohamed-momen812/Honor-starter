@@ -16,7 +16,14 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'stock' => $this->stock,
             'sku' => $this->sku,
-            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            'categories' => $this->whenLoaded('categories', function () {
+                return $this->categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

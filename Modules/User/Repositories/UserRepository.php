@@ -29,14 +29,17 @@ class UserRepository implements UserRepositoryInterface
                 AllowedFilter::partial('email'), // match any part of the email
             ])
             ->allowedSorts(['name', 'email', 'created_at'])
-            ->allowedIncludes(['roles'])
+            ->defaultSort('created_at')
+            ->allowedIncludes(['roles', 'orders']) // Include related roles if needed (frontend ask for it)
             ->paginate($perPage)
             ->appends(request()->query()); // Append filters to pagination links
     }
 
     public function findById(int $id): ?User
     {
-        return User::with('roles')->find($id);
+        return QueryBuilder::for(User::class)
+            ->allowedIncludes(['roles', 'orders']) // Include related roles if needed (frontend ask for it)
+            ->findOrFail($id);
     }
 
     public function create(array $data): User

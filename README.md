@@ -56,3 +56,23 @@ Handles order management for the E-Commerce API.
 - **GET /api/v1/orders/{id}**: Show an order (requires `manage-orders`).
 - **PUT /api/v1/orders/{id}**: Update an order (requires `manage-orders`).
 - **DELETE /api/v1/orders/{id}**: Delete an order (requires `manage-orders`).
+
+# Notification Module
+Handles notification management for the E-Commerce API.
+
+## Endpoints
+- **GET /api/v1/notifications**: List all notifications (requires `view-notifications`).
+  - Query Parameters:
+    - `filter[id]`: Exact notification ID (e.g., `filter[id]=1`).
+    - `filter[user_id]`: User ID (e.g., `filter[user_id]=2`, admin-only).
+    - `filter[type]`: Notification type (e.g., `filter[type]=order_status_updated`).
+    - `filter[unread]`: Unread notifications (e.g., `filter[unread]=true`).
+    - `sort`: Sort by field (e.g., `sort=created_at`, `sort=-read_at`).
+    - `include`: Include user (e.g., `include=user`).
+- **POST /api/v1/notifications**: Create a notification (requires `manage-notifications`).
+- **GET /api/v1/notifications/{id}**: Show a notification (requires `manage-notifications` or ownership).
+- **PUT /api/v1/notifications/{id}**: Update a notification (e.g., mark as read, requires `manage-notifications` or ownership).
+- **DELETE /api/v1/notifications/{id}**: Delete a notification (requires `manage-notifications` or ownership).
+
+## Events
+- **OrderStatusUpdated**: Triggers a notification when an order’s status changes.

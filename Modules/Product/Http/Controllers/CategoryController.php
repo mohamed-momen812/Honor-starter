@@ -55,10 +55,12 @@ class CategoryController extends Controller
      *     ),
      *     security={{"sanctum":{}}}
      * )
- */
+    */
     public function index(): JsonResponse
     {
-        $categories = $this->categoryService->getPaginatedCategories();
+        $perPage = request()->get('per_page', 15);
+
+        $categories = $this->categoryService->getPaginatedCategories($perPage);
         return $this->successResponse(CategoryResource::collection($categories));
     }
 
@@ -85,7 +87,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $category = $this->categoryService->createCategory($data);
+        $category = $this->categoryService->createCategory($data, $request->input('products', []));
         return $this->successResponse(new CategoryResource($category), 201);
     }
 

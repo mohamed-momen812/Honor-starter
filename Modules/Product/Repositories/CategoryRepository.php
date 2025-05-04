@@ -26,6 +26,8 @@ class CategoryRepository implements CategoryRepositoryInterface
             ])
             ->defaultSort('-created_at')
             ->allowedSorts(['name', 'created_at'])
+            ->allowedIncludes(['products'])
+            ->withCount('products')
             ->paginate($perPage)
             ->appends(request()->query());
     }
@@ -33,7 +35,10 @@ class CategoryRepository implements CategoryRepositoryInterface
 
     public function findById(int $id): ?Category
     {
-        return Category::find($id);
+       return QueryBuilder::for(Category::class)
+            ->allowedIncludes(['products'])
+            ->withCount('products')
+            ->find($id);
     }
 
     public function create(array $data): Category

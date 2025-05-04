@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\OrderStatusUpdated;
+use App\Listeners\OrderStatusUpdatedListener;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+         Event::listen(
+            OrderStatusUpdated::class,
+            OrderStatusUpdatedListener::class,
+        );
     }
 }

@@ -27,7 +27,7 @@ class ProductRepository implements ProductRepositoryInterface
                 AllowedFilter::scope('price_lte', 'wherePriceLessThanOrEqual'), // custom scope
                 AllowedFilter::scope('price_gte', 'wherePriceGreaterThanOrEqual'), // custom scope
                 AllowedFilter::exact('stock'),  // exact match
-                AllowedFilter::exact('categories.id', 'category_id'),
+                AllowedFilter::exact('categories.id'),
                 AllowedFilter::custom('stock_range', new StockRangeFilter), // custom filter
             ])
             ->allowedSorts(['name', 'price', 'stock', 'created_at'])
@@ -38,7 +38,9 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function findById(int $id): ?Product
     {
-        return Product::find($id);
+        return QueryBuilder::for(Product::class)
+            ->allowedIncludes(['categories'])
+            ->find($id);
     }
 
     public function create(array $data): Product
