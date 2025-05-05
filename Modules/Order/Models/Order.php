@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\User\Models\User;
 use Modules\Order\Models\OrderItem;
+use Modules\Payment\Models\Payment;
 
 class Order extends Model
 {
@@ -28,6 +29,11 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     public function scopeWhereTotalLessThanOrEqual($query, $value)

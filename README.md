@@ -47,6 +47,16 @@ Handles product and category management for the E-Commerce API.
 - **PUT /api/v1/categories/{id}**: Update a category (requires `manage-categories`).
 - **DELETE /api/v1/categories/{id}**: Delete a category (requires `manage-categories`).
 
+# Cart Module
+Handles cart management for the E-Commerce API.
+
+## Endpoints
+- **GET /api/v1/cart**: View user cart (requires `view-cart`).
+- **POST /api/v1/cart**: Add item to cart (requires `manage-cart`).
+- **PUT /api/v1/cart/items/{id}**: Update cart item quantity (requires `manage-cart`).
+- **DELETE /api/v1/cart/items/{id}**: Remove item from cart (requires `manage-cart`).
+- **POST /api/v1/cart/checkout**: Checkout to create an order (requires `manage-cart`).
+
 # Order Module
 Handles order management for the E-Commerce API.
 
@@ -76,3 +86,21 @@ Handles notification management for the E-Commerce API.
 
 ## Events
 - **OrderStatusUpdated**: Triggers a notification when an order’s status changes.
+
+# Payment Module
+Handles payment processing for the E-Commerce API using Stripe.
+
+## Endpoints
+- **GET /api/v1/payments**: List all payments (requires `view-payments`).
+  - Query Parameters:
+    - `filter[id]`: Exact payment ID (e.g., `filter[id]=1`).
+    - `filter[user_id]`: User ID (e.g., `filter[user_id]=2`, admin-only).
+    - `filter[order_id]`: Order ID (e.g., `filter[order_id]=1`).
+    - `filter[status]`: Payment status (e.g., `filter[status]=succeeded`).
+    - `sort`: Sort by field (e.g., `sort=amount`, `sort=-created_at`).
+    - `include`: Include user, order (e.g., `include=user,order`).
+- **POST /api/v1/payments**: Create a payment intent (requires `manage-payments` or `manage-cart`).
+- **GET /api/v1/payments/{id}**: Show a payment (requires `view-payments`).
+
+## Webhooks
+- **POST /api/webhook/stripe**: Handles Stripe webhook events (e.g., `payment_intent.succeeded`, `payment_intent.payment_failed`).

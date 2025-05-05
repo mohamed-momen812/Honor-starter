@@ -17,7 +17,7 @@ class NotificationSeeder extends Seeder
             'type' => 'order_status_updated',
             'data' => [
                 'order_id' => 1,
-                'status' => 'shipped',
+                'status' => 'pending',
                 'message' => 'Your order #1 has been updated to shipped.',
             ],
         ]);

@@ -8,4 +8,6 @@ Route::prefix('v1')->group(function () {
     require base_path('Modules/Product/Routes/api.php');
     require base_path('Modules/Order/Routes/api.php');
     require base_path('Modules/Notification/Routes/api.php');
+
+    Route::post('webhook/stripe', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 });

@@ -53,4 +53,18 @@ class ProductService
     {
         return $this->productRepository->delete($id);
     }
+
+    public function updateStock(int $productId, int $quantity, bool $decrement = true): Product
+    {
+        $product = Product::findOrFail($productId);
+        if ($decrement) {
+            if ($product->stock < $quantity) {
+                throw new \Exception("Insufficient stock for product {$product->name}");
+            }
+            $product->decrement('stock', $quantity);
+        } else {
+            $product->increment('stock', $quantity);
+        }
+        return $product;
+    }
 }

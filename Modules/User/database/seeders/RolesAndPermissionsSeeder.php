@@ -27,6 +27,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'view-products',
             'manage-orders',
             'view-orders',
+            'manage-cart',
+            'view-cart',
+            'manage-checkout',
+            'view-checkout',
+            'manage-payments',
+            'view-payments',
             'manage-notifications',
             'view-notifications',
         ];

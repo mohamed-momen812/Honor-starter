@@ -12,10 +12,13 @@ class NotificationResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user' => [
-                'name' => $this->user->name,
-                'email' => $this->user->email,
-            ],
+            'user' => $this->whenLoaded('user', function () {
+                return [
+                    'id' => $this->user->id,
+                    'name' => $this->user->name,
+                    'email' => $this->user->email,
+                ];
+            }),
             'type' => $this->type,
             'data' => $this->data,
             'read_at' => $this->read_at ? $this->read_at->toIso8601String() : null,

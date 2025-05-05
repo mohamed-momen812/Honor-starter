@@ -41,9 +41,17 @@ class OrderRepository implements OrderRepositoryInterface
             ->find($id);
     }
 
-    public function create(array $data): Order
+    public function create(array $data, array $orderItems): Order
     {
-        return Order::create($data);
+        $order = Order::create($data);
+        foreach ($orderItems as $item) {
+            $order->items()->create([
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ]);
+        }
+        return $order->load('items.product');
     }
 
     public function update(int $id, array $data): Order

@@ -4,5 +4,7 @@
     "Product": true,
     "Order": true,
     "Notification": true,
-    "Category": true
+    "Category": true,
+    "Cart": true,
+    "Payment": true
 }

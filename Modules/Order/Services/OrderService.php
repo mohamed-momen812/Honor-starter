@@ -6,8 +6,6 @@ use Modules\Order\Models\Order;
 use Modules\Order\Repositories\OrderRepositoryInterface;
 use Modules\Product\Models\Product;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 
 class OrderService
 {
@@ -18,14 +16,14 @@ class OrderService
         $this->orderRepository = $orderRepository;
     }
 
-    public function getAllOrders(): Collection
+    public function getAllOrders()
     {
         return $this->orderRepository->getAll();
     }
 
-    public function getPaginatedOrders(int $perPage = 15): LengthAwarePaginator
+    public function getPaginatedOrders(int $perPage = 15)
     {
-        return $this->orderRepository->paginate( $perPage);
+        return $this->orderRepository->paginate($perPage);
     }
 
     public function findOrderById(int $id): ?Order
@@ -33,37 +31,35 @@ class OrderService
         return $this->orderRepository->findById($id);
     }
 
-    public function createOrder(array $data, array $items): Order
+    public function createOrder(array $data): Order
     {
-        return DB::transaction(function () use ($data, $items) {
-            $total = 0;
-            $orderData = [
-                'user_id' => $data['user_id'],
-                'status' => $data['status'] ?? 'pending',
-                'total' => 0, // Will be updated
-            ];
-
-            $order = $this->orderRepository->create($orderData);
-
-            foreach ($items as $item) {
-                $product = Product::findOrFail($item['product_id']);
-                if ($product->stock < $item['quantity']) {
-                    throw new \Exception("Insufficient stock for product: {$product->name}");
+        return DB::transaction(function () use ($data) {
+            // Validate user_id matches authenticated user for customers
+            if (!auth()->user()->hasPermissionTo('manage-orders')) {
+                if ($data['user_id'] !== auth()->id()) {
+                    throw new \Exception('Unauthorized to create order for another user');
                 }
-
-                $order->items()->create([
-                    'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $product->price,
-                ]);
-
-                $total += $product->price * $item['quantity'];
-                $product->decrement('stock', $item['quantity']);
             }
 
-            $order->update(['total' => $total]);
+            $orderData = [
+                'user_id' => $data['user_id'],
+                'total' => $data['total'],
+                'status' => $data['status'] ?? 'pending',
+            ];
 
-            return $order;
+            // Validate order items
+            foreach ($data['order_items'] as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                // Skip stock decrement if already handled (e.g., by Cart)
+                if (!isset($item['skip_stock_check'])) {
+                    if ($product->stock < $item['quantity']) {
+                        throw new \Exception("Insufficient stock for product {$product->name}");
+                    }
+                    $product->decrement('stock', $item['quantity']);
+                }
+            }
+
+            return $this->orderRepository->create($orderData, $data['order_items']);
         });
     }
 

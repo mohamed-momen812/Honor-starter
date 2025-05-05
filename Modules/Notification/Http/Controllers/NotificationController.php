@@ -2,6 +2,7 @@
 
 namespace Modules\Notification\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Modules\Notification\Http\Requests\StoreNotificationRequest;
 use Modules\Notification\Http\Requests\UpdateNotificationRequest;
@@ -9,52 +10,7 @@ use Modules\Notification\Http\Resources\NotificationResource;
 use Modules\Notification\Services\NotificationService;
 use App\Traits\ApiResponse;
 
-/**
- * @OA\Get(
- *     path="/api/v1/notifications",
- *     tags={"Notifications"},
- *     summary="List all notifications with filtering and sorting",
- *     @OA\Parameter(
- *         name="filter[id]",
- *         in="query",
- *         description="Filter by exact notification ID",
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="filter[user_id]",
- *         in="query",
- *         description="Filter by user ID",
- *         @OA\Schema(type="integer")
- *     ),
- *     @OA\Parameter(
- *         name="filter[type]",
- *         in="query",
- *         description="Filter by notification type",
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Parameter(
- *         name="filter[unread]",
- *         in="query",
- *         description="Filter unread notifications",
- *         @OA\Schema(type="boolean")
- *     ),
- *     @OA\Parameter(
- *         name="sort",
- *         in="query",
- *         description="Sort by field (e.g., created_at, -read_at)",
- *         @OA\Schema(type="string")
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Paginated list of notifications",
- *         @OA\JsonContent(
- *             type="array",
- *             @OA\Items(ref="#/components/schemas/Notification")
- *         )
- *     ),
- *     security={{"sanctum":{}}}
- * )
- */
+
 class NotificationController extends Controller
 {
     use ApiResponse;
@@ -66,9 +22,57 @@ class NotificationController extends Controller
         $this->notificationService = $notificationService;
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/notifications",
+     *     tags={"Notifications"},
+     *     summary="List all notifications with filtering and sorting",
+     *     @OA\Parameter(
+     *         name="filter[id]",
+     *         in="query",
+     *         description="Filter by exact notification ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="filter[user_id]",
+     *         in="query",
+     *         description="Filter by user ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="filter[type]",
+     *         in="query",
+     *         description="Filter by notification type",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="filter[unread]",
+     *         in="query",
+     *         description="Filter unread notifications",
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Sort by field (e.g., created_at, -read_at)",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Paginated list of notifications",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Notification")
+     *         )
+     *     ),
+     *     security={{"sanctum":{}}}
+     * )
+     */
     public function index(): JsonResponse
     {
-        $notifications = $this->notificationService->getPaginatedNotifications();
+        $perPage = request()->get('per_page', 15);
+
+        $notifications = $this->notificationService->getPaginatedNotifications($perPage);
         return $this->successResponse(NotificationResource::collection($notifications));
     }
 

@@ -5,6 +5,8 @@ namespace Modules\Notification\Repositories;
 use Modules\Notification\Models\Notification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class NotificationRepository implements NotificationRepositoryInterface
 {
@@ -15,12 +17,28 @@ class NotificationRepository implements NotificationRepositoryInterface
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Notification::with('user')->paginate($perPage);
+        $query = QueryBuilder::for(Notification::class)
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('user_id'),
+                AllowedFilter::exact('type'),
+                AllowedFilter::scope('unread', 'whereUnread'),
+            ])
+            ->allowedSorts(['created_at', 'read_at'])
+            ->allowedIncludes(['user']);
+
+        if (!auth()->user()->hasPermissionTo('manage-notifications')) {
+            $query->where('user_id', auth()->id());
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function findById(int $id): ?Notification
     {
-        return Notification::with('user')->find($id);
+        return QueryBuilder::for(Notification::class)
+            ->allowedIncludes(['user'])
+            ->findOrFail($id);
     }
 
     public function create(array $data): Notification
